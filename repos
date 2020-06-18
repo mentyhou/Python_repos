@@ -1,0 +1,53 @@
+import requests
+import pygal
+from pygal.style import LightColorizedStyle as LCS, LightenStyle as LS
+
+# Make an API call, and store the response.
+url = 'https://api.github.com/search/repositories?q=language:python&sort=stars'
+r = requests.get(url)
+print("Status code:", r.status_code)
+
+# Store API response in a variable.
+response_dict = r.json()
+print("Total repositories:", response_dict['total_count'])
+
+# Explore information about the repositories.
+repo_dicts = response_dict['items']
+
+names, plot_dicts = [], []
+
+for repo_dict in repo_dicts:
+    names.append(repo_dict['name'])
+    plot_dict = {'value': repo_dict['stargazers_count'],
+                 'label': repo_dict['description'],
+                 'xlink': repo_dict['html_url']}
+    plot_dicts.append(plot_dict)
+
+# 可视化操作
+# 设定图表的外观
+# 创建实例对象，用于修改图表外观
+my_config = pygal.Config()
+# 让横坐标标签绕X轴旋转45度
+my_config.x_label_rotation = 45
+# 设置图例为可见
+my_config.show_legend = True
+# 设置图标标题字体大小
+my_config.title_font_size = 24
+my_config.label_font_size = 14
+# 设置主标签的字体大小
+my_config.major_label_font_size = 20
+# 将过长的名字控制在只显示15个字符
+my_config.truncate_label = 15
+# 隐藏图表中的水平线
+my_config.show_y_guides = False
+# 设置图表宽度
+my_config.width = 1000
+# 使用pygal.Bar()方法创建条形图，并传递参数my_config
+chart = pygal.Bar(my_config)
+chart.title = 'Most-Starred '
+# x轴坐标标签接受一个列表
+chart.x_labels = names
+# 方法add（）接受两个参数，一个字符串，一个列表
+chart.add('D6', plot_dicts)
+# 生成文件
+chart.render_to_file('55555555555.svg')
